@@ -6,17 +6,28 @@
 
 ## 下载成品
 
-不想自己生成就直接下：**[Releases · v2-ff512-solitude3](../../releases/tag/v2-ff512-solitude3)** 挂着 `GTA4-CN-FusionFix5.1.2-Solitude3-menu-v2.zip`（30,891 字节）：
+**[Releases · v2-ff512-solitude3](../../releases/tag/v2-ff512-solitude3)** 上有两个包，按需选：
+
+| 附件 | 字节 | 内容 | 适合谁 |
+|---|---|---|---|
+| `GTA4-CN-FusionFix5.1.2-Solitude3-full-v2.zip` | 647,822 | `GTA4.CHS.asi`（已修卡死）+ 原版 asi 备份 + `plugins\GTA4.CHS\` 三个数据文件 + 三份菜单 xml + 安装说明 | 开箱即用 |
+| `GTA4-CN-FusionFix5.1.2-Solitude3-menu-v2.zip` | 30,891 | 汉化表 + 三份 xml + 安装说明 | 已有自己的 asi |
+
+full 包内容：
 
 ```
-plugins/GTA4.CHS/custom_translations.json     3,076
-update/common/data/frontend_menus.xml        91,666
-update/TLAD/common/data/frontend_menus.xml  112,673
+plugins/GTA4.CHS.asi                       232,960
+plugins/GTA4.CHS.asi.bak                   232,448   ← 上游原版，只作回滚，不加载
+plugins/GTA4.CHS/char_table.dat             14,324
+plugins/GTA4.CHS/custom_translations.json    3,076
+plugins/GTA4.CHS/whm_table.dat             780,676
+update/common/data/frontend_menus.xml       91,666
+update/TLAD/common/data/frontend_menus.xml 112,673
 update/TBoGT/common/data/frontend_menus.xml 104,129
 安装说明.md
 ```
 
-解压后直接覆盖到游戏根目录即可。
+`plugins\GTA4.CHS\` 里三个文件缺一不可：只装 `custom_translations.json` 会缺字符映射与字库，中文会异常。整目录覆盖即可。
 
 ## 两条分支怎么选
 
@@ -34,6 +45,7 @@ update/TBoGT/common/data/frontend_menus.xml 104,129
 | FusionFix | `5.1.2.0-cad0970`（14,526,680 字节） |
 | 汉化表 | 87 条 / 3,076 字节（选项名 60 + 取值 27） |
 | 菜单产物 | `frontend_menus.xml`：91,666 / 112,673 / 104,129 字节（common / TLAD / TBoGT） |
+| 汉化程序 | `GTA4.CHS.asi`：232,960 字节（上游 232,448 + 两处二进制修复） |
 | 适配 mod | Solitude 3（其自带菜单按 FusionFix 4.0.5 写成） |
 
 版本串一变，就按《维护手册》走一遍，不要只改一处。
@@ -47,7 +59,7 @@ update/TBoGT/common/data/frontend_menus.xml 104,129
 
 ## 安装
 
-1. 汉化表：`plugins/GTA4.CHS/custom_translations.json`
+1. 汉化程序：`plugins\GTA4.CHS.asi` + `plugins\GTA4.CHS\` 整个目录（`custom_translations.json`、`char_table.dat`、`whm_table.dat`）
 
 2. 菜单资产（用本地 FusionFix 官方包现场生成，仓库不存 xml 本体）：
 
@@ -84,6 +96,6 @@ DistantLights = 1    # 需已装 Project 2DFX
 
 ## 许可
 
+- `GTA4.CHS.asi` 及其 `.bak`、两份 `.dat` 版权归上游 `ckeleshi/GTA4.CHS`，本仓库只在该产物上做两处兼容性修复。
 - 汉化表为对上游 `ckeleshi/GTA4.CHS` 的派生，沿用其许可。
 - 菜单 xml 基于 [ThirteenAG/GTAIV.EFLC.FusionFix](https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix)（**GPL-3.0**），本仓库只改三章各 1 处 options 标签文本。
-- 本仓库不含 Solitude 与 FusionFix 的任何原始二进制。
