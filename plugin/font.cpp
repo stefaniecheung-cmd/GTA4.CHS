@@ -90,6 +90,14 @@ const GTAChar* CFont::SkipWord(const GTAChar* str)
 
         if (chr == ' ' || chr == '~' || chr == 0)
         {
+            // FIX(#token-bounds): 词首的 '~' 原样 break 不前进时，
+            // GetMaxWordWidth 的 while (*text != 0) 循环会原地打转（死循环）。
+            // 仅在未推进且是 '~' 时前进一格；NUL 终止符不前进。
+            if (chr == '~' && current == begin)
+            {
+                ++current;
+            }
+
             break;
         }
 
@@ -254,7 +262,11 @@ float CFont::GetStringWidthRemake(const GTAChar* str, bool get_all)
             }
 
             // 91BFD3
-            while (*str != '~')
+            // FIX(#token-bounds): 原来只检查 '~'，若字符串末尾没有第二个
+            // token，循环会冲出字符串结尾、越界扫进后续内存——表现为暂停菜单
+            // 周期性卡顿（每帧秒级），极端情况下扫到未映射页触发 0xC0000005
+            // 崩溃。加 NUL 兜底。
+            while (*str != '~' && *str != 0)
             {
                 // 91BFE0
                 if (*str == 'n')
@@ -267,8 +279,11 @@ float CFont::GetStringWidthRemake(const GTAChar* str, bool get_all)
             }
 
             // 91C013
-            // 跳过后边的'~'
-            ++str;
+            // 跳过后边的'~'（循环因 NUL 退出时不再前进，避免越过字符串末尾）
+            if (*str != 0)
+            {
+                ++str;
+            }
 
             AddSpecialPunctuationMarksWidth(str, &current_width);
 
