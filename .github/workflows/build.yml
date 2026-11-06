@@ -35,7 +35,6 @@ jobs:
             $found = "C:\vcpkg-src"
           }
           "root=$found" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          Write-Host "vcpkg root: $found"
 
       - name: Install deps
         shell: pwsh
@@ -48,6 +47,14 @@ jobs:
             fmt:x86-windows-static `
             zlib:x86-windows-static
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Restore patch script
+        shell: pwsh
+        run: |
+          $b64 = (Get-Content -LiteralPath ".github/patch_font.py.b64" -Raw).Trim()
+          [IO.File]::WriteAllBytes(".github/patch_font.py", [Convert]::FromBase64String($b64))
+          $n = (Get-Item -LiteralPath ".github/patch_font.py").Length
+          if ($n -ne 3662) { Write-Error "patch script size $n != 3662"; exit 1 }
 
       - name: Apply font.cpp fix
         shell: pwsh
