@@ -4,6 +4,20 @@
 
 上游项目：[ckeleshi/GTA4.CHS](https://github.com/ckeleshi/GTA4.CHS)（适用于 GTA4 三合一 1.2.0.43+ 的汉化程序）。
 
+## 下载成品
+
+不想自己生成就直接下：**[Releases · v2-ff512-solitude3](../../releases/tag/v2-ff512-solitude3)** 挂着 `GTA4-CN-FusionFix5.1.2-Solitude3-menu-v2.zip`（30,891 字节）：
+
+```
+plugins/GTA4.CHS/custom_translations.json     3,076
+update/common/data/frontend_menus.xml        91,666
+update/TLAD/common/data/frontend_menus.xml  112,673
+update/TBoGT/common/data/frontend_menus.xml 104,129
+安装说明.md
+```
+
+解压后直接覆盖到游戏根目录即可。
+
 ## 两条分支怎么选
 
 | 分支 | 内容 | 适合谁 |
@@ -38,7 +52,7 @@
 2. 菜单资产（用本地 FusionFix 官方包现场生成，仓库不存 xml 本体）：
 
 ```bash
-python tools/build_ff512_solitude_menu.py --src "<FusionFix>\\update" --out "<输出目录>"
+python tools/build_ff512_solitude_menu.py --src "<FusionFix>\update" --out "<输出目录>"
 ```
 
 生成后覆盖到 `update/{common,TLAD,TBoGT}/common/data/frontend_menus.xml`。
@@ -70,4 +84,6 @@ DistantLights = 1    # 需已装 Project 2DFX
 
 ## 许可
 
-汉化部分为对上游 `ckeleshi/GTA4.CHS` 的派生，沿用其许可。本文档与脚本仅描述兼容性修复，不含第三方二进制。
+- 汉化表为对上游 `ckeleshi/GTA4.CHS` 的派生，沿用其许可。
+- 菜单 xml 基于 [ThirteenAG/GTAIV.EFLC.FusionFix](https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix)（**GPL-3.0**），本仓库只改三章各 1 处 options 标签文本。
+- 本仓库不含 Solitude 与 FusionFix 的任何原始二进制。
