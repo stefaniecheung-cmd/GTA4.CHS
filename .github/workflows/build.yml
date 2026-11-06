@@ -1,0 +1,83 @@
+name: build-asi
+
+on:
+  push:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC x86
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Resolve vcpkg
+        id: vcp
+        shell: pwsh
+        run: |
+          $candidates = @()
+          if ($env:VCPKG_ROOT) { $candidates += $env:VCPKG_ROOT }
+          $candidates += "C:\vcpkg"
+          $found = $null
+          foreach ($c in $candidates) {
+            if ($c -and (Test-Path -LiteralPath (Join-Path $c "vcpkg.exe"))) { $found = $c; break }
+          }
+          if (-not $found) {
+            git clone --depth 1 https://github.com/microsoft/vcpkg.git C:\vcpkg-src
+            & C:\vcpkg-src\bootstrap-vcpkg.bat
+            $found = "C:\vcpkg-src"
+          }
+          "root=$found" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "vcpkg root: $found"
+
+      - name: Install deps
+        shell: pwsh
+        run: |
+          $root = "${{ steps.vcp.outputs.root }}"
+          & (Join-Path $root "vcpkg.exe") install `
+            nlohmann-json:x86-windows-static `
+            utf8cpp:x86-windows-static `
+            spdlog:x86-windows-static `
+            fmt:x86-windows-static `
+            zlib:x86-windows-static
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Apply font.cpp fix
+        shell: pwsh
+        run: |
+          python .github/patch_font.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Configure
+        shell: pwsh
+        env:
+          VCPKG_ROOT: ${{ steps.vcp.outputs.root }}
+        run: |
+          cmake --version
+          cmake --preset windows-x86-base
+
+      - name: Build Release
+        shell: pwsh
+        run: cmake --build --preset x86-release
+
+      - name: List outputs
+        shell: pwsh
+        run: |
+          Get-ChildItem -LiteralPath "out/build/windows-x86-base/Release" -Recurse -Include *.asi,*.exe |
+            Select-Object FullName, Length
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GTA4.CHS-x86
+          path: |
+            out/build/windows-x86-base/Release/**/*.asi
+            out/build/windows-x86-base/Release/**/*.exe
+          if-no-files-found: error
